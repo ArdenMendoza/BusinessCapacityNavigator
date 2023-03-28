@@ -1,14 +1,17 @@
-import React from "react";
+import { useReducer } from "react";
 import { BCapNavigator } from "./BCapNavigator";
-import { iTreeNode } from "./components/TreeNode";
-import { TreeView } from "./components/TreeView";
+import { TreeViewContext, treeViewReducer, TreeViewState } from "./context";
 
 function App() {
+  const [state, dispatch] = useReducer(treeViewReducer, new TreeViewState());
+
   return (
-    <div>
-      <h1>React Coding Exercise</h1>
+    <TreeViewContext.Provider value={{ state, dispatch }}>
+      <div>
+        <h1>React Coding Exercise</h1>
+      </div>
       <BCapNavigator />
-    </div>
+    </TreeViewContext.Provider>
   );
 }
 

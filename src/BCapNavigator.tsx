@@ -25,7 +25,12 @@ export const BCapNavigator = () => {
     max: 0,
   });
 
-  const treeData: TreeNode[] = getUnique(applications, "BCAP1")
+  const treeData: TreeNode[] = getUnique(
+    applications.filter(
+      (f) => f.spend >= spendingLimits.min && f.spend <= spendingLimits.max
+    ),
+    "BCAP1"
+  )
     .sort()
     .map((bcap1) => {
       const bcap1_apps = applications.filter((f) => f.BCAP1 === bcap1);

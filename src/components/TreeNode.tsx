@@ -4,6 +4,7 @@ export type TreeNode = {
   id: number;
   label: string;
   children?: TreeNode[];
+  onClick?: () => void;
 };
 
 export const TreeNode: React.FC<{ node: TreeNode; indention: number }> = ({
@@ -29,7 +30,7 @@ export const TreeNode: React.FC<{ node: TreeNode; indention: number }> = ({
           {isExpanded ? "-" : "+"}
         </button>
       )}
-      {node.label}
+      <span onClick={() => node.onClick && node.onClick()}>{node.label}</span>
       {node.children && isExpanded && (
         <div style={{ marginLeft: 30 }}>
           {node.children.map((childNode) => (

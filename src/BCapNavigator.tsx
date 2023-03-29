@@ -10,8 +10,9 @@ const getUnique = (dataArray: Application[], propName: string) =>
 
 export const BCapNavigator = () => {
   const {
-    state: { applications },
+    state: { applications, selectedApps },
   } = useContext(TreeViewContext);
+  const { dispatch } = useContext(TreeViewContext);
 
   const { min, max } = React.useMemo(
     () => ({
@@ -37,6 +38,8 @@ export const BCapNavigator = () => {
       return {
         id: bcap1,
         label: bcap1,
+        onClick: () =>
+          dispatch({ type: "setSelectedApps", payload: bcap1_apps }),
         children: getUnique(bcap1_apps, "BCAP2")
           .sort()
           .map((bcap2) => {
@@ -44,12 +47,23 @@ export const BCapNavigator = () => {
             return {
               id: bcap2,
               label: bcap2,
+              onClick: () =>
+                dispatch({ type: "setSelectedApps", payload: bcap2_apps }),
               children: getUnique(bcap2_apps, "BCAP3")
                 .sort()
                 .map((bcap3) => {
+                  const bcap3_apps = applications.filter(
+                    (f) => f.BCAP3 === bcap3
+                  );
+
                   return {
                     id: bcap3,
                     label: bcap3,
+                    onClick: () =>
+                      dispatch({
+                        type: "setSelectedApps",
+                        payload: bcap3_apps,
+                      }),
                   };
                 }),
             };
@@ -83,7 +97,7 @@ export const BCapNavigator = () => {
         </div>
       </div>
       <hr />
-      <div style={{ flex: 1 }}></div>
+      <div style={{ flex: 1 }}>{JSON.stringify(selectedApps)}</div>
     </div>
   );
 };

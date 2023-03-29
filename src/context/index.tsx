@@ -5,6 +5,7 @@ import { Application } from "../models";
 export class TreeViewState {
   applications: Application[];
   expandedNodes: number[];
+  selectedApps?: Application[];
   constructor() {
     this.applications = [];
     this.expandedNodes = [];
@@ -13,7 +14,8 @@ export class TreeViewState {
 type TreeViewAction =
   | { type: "expandNode"; payload: number }
   | { type: "collapseNode"; payload: number }
-  | { type: "setApplications"; payload: Application[] };
+  | { type: "setApplications"; payload: Application[] }
+  | { type: "setSelectedApps"; payload: Application[] };
 
 export const treeViewReducer = (
   state: TreeViewState,
@@ -36,6 +38,11 @@ export const treeViewReducer = (
       return {
         ...state,
         applications: action.payload,
+      };
+    case "setSelectedApps":
+      return {
+        ...state,
+        selectedApps: action.payload,
       };
     default:
       return state;

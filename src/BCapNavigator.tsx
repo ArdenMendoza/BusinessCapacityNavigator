@@ -17,7 +17,10 @@ export const BCapNavigator = () => {
   const { min, max } = React.useMemo(
     () => ({
       min: applications.map((m) => m.spend).sort()[0],
-      max: applications.map((m) => m.spend).reverse()[0],
+      max: applications
+        .map((m) => m.spend)
+        .sort()
+        .reverse()[0],
     }),
     [applications]
   );
@@ -92,6 +95,7 @@ export const BCapNavigator = () => {
             setSpendingFilter({ min, max: parseInt(val.currentTarget.value) })
           }
           value={spendingFilter.max}
+          style={{ width: "100%" }}
         />
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div>{`$ ${numberWithCommaAndDecimal(spendingFilter.min, 2)}`}</div>

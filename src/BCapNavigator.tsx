@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
-import { TreeNode } from "./components/TreeNode";
 import { TreeView } from "./components/TreeView";
-import { TreeViewContext } from "./context";
+import { SelectedNode, TreeViewContext } from "./context";
 import { Application } from "./models";
 import { numberWithCommaAndDecimal } from "./utils/numberUtils";
 
@@ -10,7 +9,7 @@ const getUnique = (dataArray: Application[], propName: string) =>
 
 export const BCapNavigator = () => {
   const {
-    state: { applications, selectedApps },
+    state: { applications, selectedNode },
   } = useContext(TreeViewContext);
   const { dispatch } = useContext(TreeViewContext);
 
@@ -24,58 +23,87 @@ export const BCapNavigator = () => {
     }),
     [applications]
   );
-  const [spendingFilter, setSpendingFilter] = React.useState({
+  const [queryFilter, setQueryFilter] = React.useState({
     min: 0,
     max: 0,
   });
 
-  const treeData: TreeNode[] = getUnique(
-    applications.filter(
-      (f) => f.spend >= spendingFilter.min && f.spend <= spendingFilter.max
-    ),
-    "BCAP1"
-  )
-    .sort()
-    .map((bcap1) => {
-      const bcap1_apps = applications.filter((f) => f.BCAP1 === bcap1);
-      return {
-        id: bcap1,
-        label: bcap1,
-        onClick: () =>
-          dispatch({ type: "setSelectedApps", payload: bcap1_apps }),
-        children: getUnique(bcap1_apps, "BCAP2")
-          .sort()
-          .map((bcap2) => {
-            const bcap2_apps = applications.filter((f) => f.BCAP2 === bcap2);
-            return {
-              id: bcap2,
-              label: bcap2,
-              onClick: () =>
-                dispatch({ type: "setSelectedApps", payload: bcap2_apps }),
-              children: getUnique(bcap2_apps, "BCAP3")
-                .sort()
-                .map((bcap3) => {
-                  const bcap3_apps = applications.filter(
-                    (f) => f.BCAP3 === bcap3
-                  );
+  const filteredApps = React.useMemo(
+    () =>
+      applications.filter(
+        (app: Application) =>
+          app.spend >= queryFilter.min && app.spend <= queryFilter.max
+      ),
+    [applications, queryFilter]
+  );
 
-                  return {
-                    id: bcap3,
-                    label: bcap3,
-                    onClick: () =>
-                      dispatch({
-                        type: "setSelectedApps",
-                        payload: bcap3_apps,
-                      }),
-                  };
-                }),
-            };
-          }),
-      };
+  const treeData = React.useMemo(
+    () =>
+      getUnique(filteredApps, "BCAP1")
+        .sort()
+        .map((bcap1) => {
+          const bcap1_apps = filteredApps.filter((f) => f.BCAP1 === bcap1);
+          return {
+            id: bcap1,
+            label: bcap1,
+            onClick: () =>
+              dispatch({
+                type: "setSelectedNode",
+                payload: new SelectedNode(1, bcap1),
+              }),
+            children: getUnique(bcap1_apps, "BCAP2")
+              .sort()
+              .map((bcap2) => {
+                const bcap2_apps = filteredApps.filter(
+                  (f) => f.BCAP2 === bcap2
+                );
+                return {
+                  id: bcap2,
+                  label: bcap2,
+                  onClick: () =>
+                    dispatch({
+                      type: "setSelectedNode",
+                      payload: new SelectedNode(2, bcap2),
+                    }),
+                  children: getUnique(bcap2_apps, "BCAP3")
+                    .sort()
+                    .map((bcap3) => {
+                      const bcap3_apps = filteredApps.filter(
+                        (f) => f.BCAP3 === bcap3
+                      );
+
+                      return {
+                        id: bcap3,
+                        label: bcap3,
+                        onClick: () =>
+                          dispatch({
+                            type: "setSelectedNode",
+                            payload: new SelectedNode(3, bcap3),
+                          }),
+                      };
+                    }),
+                };
+              }),
+          };
+        }),
+    [filteredApps, queryFilter]
+  );
+
+  const visibleApps = React.useMemo(() => {
+    return applications.filter((f) => {
+      switch (selectedNode.level) {
+        case 1:
+          return f.BCAP1 === selectedNode.nodeName;
+        case 2:
+          return f.BCAP2 === selectedNode.nodeName;
+        case 3:
+          return f.BCAP3 === selectedNode.nodeName;
+      }
     });
+  }, [applications, selectedNode]);
 
   React.useEffect(() => {
-    setSpendingFilter({ min, max });
+    setQueryFilter({ min, max });
   }, [min, max]);
 
   return (
@@ -92,21 +120,20 @@ export const BCapNavigator = () => {
           min={min}
           max={max}
           onChange={(val) =>
-            setSpendingFilter({ min, max: parseInt(val.currentTarget.value) })
+            setQueryFilter({ min, max: parseInt(val.currentTarget.value) })
           }
-          value={spendingFilter.max}
+          value={queryFilter.max}
           style={{ width: "100%" }}
         />
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div>{`$ ${numberWithCommaAndDecimal(spendingFilter.min, 2)}`}</div>
-          <div>{`$ ${numberWithCommaAndDecimal(spendingFilter.max, 2)}`}</div>
+          <div>{`$ ${numberWithCommaAndDecimal(queryFilter.min, 2)}`}</div>
+          <div>{`$ ${numberWithCommaAndDecimal(queryFilter.max, 2)}`}</div>
         </div>
       </div>
       <div style={{ flex: 1, borderLeft: "1px solid #888", padding: 15 }}>
-        {selectedApps
+        {visibleApps
           ?.filter(
-            (f) =>
-              f.spend >= spendingFilter.min && f.spend <= spendingFilter.max
+            (f) => f.spend >= queryFilter.min && f.spend <= queryFilter.max
           )
           ?.map((m) => (
             <AppTile id={m.id} appName={m.name} spend={m.spend} />

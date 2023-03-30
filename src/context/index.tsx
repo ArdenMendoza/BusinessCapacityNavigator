@@ -2,20 +2,26 @@ import { createContext } from "react";
 import { TreeNode } from "../components/TreeNode";
 import { Application } from "../models";
 
+export class SelectedNode {
+  constructor(public level?: 1 | 2 | 3, public nodeName?: string) {}
+}
+
 export class TreeViewState {
   applications: Application[];
   expandedNodes: number[];
   selectedApps?: Application[];
+  selectedNode: SelectedNode;
   constructor() {
     this.applications = [];
     this.expandedNodes = [];
+    this.selectedNode = {};
   }
 }
 type TreeViewAction =
   | { type: "expandNode"; payload: number }
   | { type: "collapseNode"; payload: number }
   | { type: "setApplications"; payload: Application[] }
-  | { type: "setSelectedApps"; payload: Application[] };
+  | { type: "setSelectedNode"; payload: SelectedNode };
 
 export const treeViewReducer = (
   state: TreeViewState,
@@ -39,10 +45,10 @@ export const treeViewReducer = (
         ...state,
         applications: action.payload,
       };
-    case "setSelectedApps":
+    case "setSelectedNode":
       return {
         ...state,
-        selectedApps: action.payload,
+        selectedNode: action.payload,
       };
     default:
       return state;

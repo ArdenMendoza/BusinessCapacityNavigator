@@ -60,10 +60,6 @@ export const BCapNavigator = () => {
                   children: getUnique(bcap2_apps, "BCAP3")
                     .sort()
                     .map((bcap3) => {
-                      const bcap3_apps = filteredTreeViewApps.filter(
-                        (f) => f.BCAP3 === bcap3
-                      );
-
                       return {
                         id: bcap3,
                         label: bcap3,
@@ -78,16 +74,16 @@ export const BCapNavigator = () => {
               }),
           };
         }),
-    [filteredTreeViewApps, spendingFilters]
+    [filteredTreeViewApps]
   );
 
   // Filter props
   const { min, max } = React.useMemo(
     () => ({
-      min: applications.map((m) => m.spend).sort()[0],
+      min: applications.map((m) => m.spend).sort((a, b) => a - b)[0],
       max: applications
         .map((m) => m.spend)
-        .sort()
+        .sort((a, b) => a - b)
         .reverse()[0],
     }),
     [applications]

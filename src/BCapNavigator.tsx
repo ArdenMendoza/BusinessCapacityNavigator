@@ -10,39 +10,31 @@ const getUnique = (dataArray: Application[], propName: string) =>
 export const BCapNavigator = () => {
   const {
     state: { applications, selectedNode },
+    dispatch,
   } = useContext(TreeViewContext);
-  const { dispatch } = useContext(TreeViewContext);
 
-  const { min, max } = React.useMemo(
-    () => ({
-      min: applications.map((m) => m.spend).sort()[0],
-      max: applications
-        .map((m) => m.spend)
-        .sort()
-        .reverse()[0],
-    }),
-    [applications]
-  );
-  const [queryFilter, setQueryFilter] = React.useState({
+  const [spendingFilters, setSpendingFilters] = React.useState({
     min: 0,
     max: 0,
   });
 
-  const filteredApps = React.useMemo(
+  // TreeView props
+  const filteredTreeViewApps = React.useMemo(
     () =>
       applications.filter(
         (app: Application) =>
-          app.spend >= queryFilter.min && app.spend <= queryFilter.max
+          app.spend >= spendingFilters.min && app.spend <= spendingFilters.max
       ),
-    [applications, queryFilter]
+    [applications, spendingFilters]
   );
-
   const treeData = React.useMemo(
     () =>
-      getUnique(filteredApps, "BCAP1")
+      getUnique(filteredTreeViewApps, "BCAP1")
         .sort()
         .map((bcap1) => {
-          const bcap1_apps = filteredApps.filter((f) => f.BCAP1 === bcap1);
+          const bcap1_apps = filteredTreeViewApps.filter(
+            (f) => f.BCAP1 === bcap1
+          );
           return {
             id: bcap1,
             label: bcap1,
@@ -54,7 +46,7 @@ export const BCapNavigator = () => {
             children: getUnique(bcap1_apps, "BCAP2")
               .sort()
               .map((bcap2) => {
-                const bcap2_apps = filteredApps.filter(
+                const bcap2_apps = filteredTreeViewApps.filter(
                   (f) => f.BCAP2 === bcap2
                 );
                 return {
@@ -68,7 +60,7 @@ export const BCapNavigator = () => {
                   children: getUnique(bcap2_apps, "BCAP3")
                     .sort()
                     .map((bcap3) => {
-                      const bcap3_apps = filteredApps.filter(
+                      const bcap3_apps = filteredTreeViewApps.filter(
                         (f) => f.BCAP3 === bcap3
                       );
 
@@ -86,25 +78,43 @@ export const BCapNavigator = () => {
               }),
           };
         }),
-    [filteredApps, queryFilter]
+    [filteredTreeViewApps, spendingFilters]
   );
 
-  const visibleApps = React.useMemo(() => {
-    return applications.filter((f) => {
-      switch (selectedNode.level) {
-        case 1:
-          return f.BCAP1 === selectedNode.nodeName;
-        case 2:
-          return f.BCAP2 === selectedNode.nodeName;
-        case 3:
-          return f.BCAP3 === selectedNode.nodeName;
-      }
-    });
-  }, [applications, selectedNode]);
-
+  // Filter props
+  const { min, max } = React.useMemo(
+    () => ({
+      min: applications.map((m) => m.spend).sort()[0],
+      max: applications
+        .map((m) => m.spend)
+        .sort()
+        .reverse()[0],
+    }),
+    [applications]
+  );
   React.useEffect(() => {
-    setQueryFilter({ min, max });
+    setSpendingFilters({ min, max });
   }, [min, max]);
+
+  const appTilesData = React.useMemo(
+    () =>
+      applications
+        .filter((f) => {
+          switch (selectedNode.level) {
+            case 1:
+              return f.BCAP1 === selectedNode.nodeName;
+            case 2:
+              return f.BCAP2 === selectedNode.nodeName;
+            case 3:
+              return f.BCAP3 === selectedNode.nodeName;
+          }
+        })
+        .filter(
+          (f) =>
+            f.spend >= spendingFilters.min && f.spend <= spendingFilters.max
+        ),
+    [applications, selectedNode, spendingFilters]
+  );
 
   return (
     <div style={{ display: "flex", gap: 5 }}>
@@ -120,24 +130,20 @@ export const BCapNavigator = () => {
           min={min}
           max={max}
           onChange={(val) =>
-            setQueryFilter({ min, max: parseInt(val.currentTarget.value) })
+            setSpendingFilters({ min, max: parseInt(val.currentTarget.value) })
           }
-          value={queryFilter.max}
+          value={spendingFilters.max}
           style={{ width: "100%" }}
         />
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div>{`$ ${numberWithCommaAndDecimal(queryFilter.min, 2)}`}</div>
-          <div>{`$ ${numberWithCommaAndDecimal(queryFilter.max, 2)}`}</div>
+          <div>{`$ ${numberWithCommaAndDecimal(spendingFilters.min, 2)}`}</div>
+          <div>{`$ ${numberWithCommaAndDecimal(spendingFilters.max, 2)}`}</div>
         </div>
       </div>
       <div style={{ flex: 1, borderLeft: "1px solid #888", padding: 15 }}>
-        {visibleApps
-          ?.filter(
-            (f) => f.spend >= queryFilter.min && f.spend <= queryFilter.max
-          )
-          ?.map((m) => (
-            <AppTile id={m.id} appName={m.name} spend={m.spend} />
-          ))}
+        {appTilesData?.map((m) => (
+          <AppTile id={m.id} appName={m.name} spend={m.spend} />
+        ))}
       </div>
     </div>
   );

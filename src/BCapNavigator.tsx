@@ -91,13 +91,14 @@ export const BCapNavigator = () => {
           onChange={(val) =>
             setSpendingFilter({ min, max: parseInt(val.currentTarget.value) })
           }
+          value={spendingFilter.max}
         />
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div>{`$ ${numberWithCommaAndDecimal(spendingFilter.min, 2)}`}</div>
           <div>{`$ ${numberWithCommaAndDecimal(spendingFilter.max, 2)}`}</div>
         </div>
       </div>
-      <div style={{ flex: 1, borderLeft: "2px solid black", padding: 15 }}>
+      <div style={{ flex: 1, borderLeft: "1px solid #888", padding: 15 }}>
         {selectedApps
           ?.filter(
             (f) =>

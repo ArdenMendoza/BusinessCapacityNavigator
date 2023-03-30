@@ -21,14 +21,14 @@ export const BCapNavigator = () => {
     }),
     [applications]
   );
-  const [spendingLimits, setSpendingLimits] = React.useState({
+  const [spendingFilter, setSpendingFilter] = React.useState({
     min: 0,
     max: 0,
   });
 
   const treeData: TreeNode[] = getUnique(
     applications.filter(
-      (f) => f.spend >= spendingLimits.min && f.spend <= spendingLimits.max
+      (f) => f.spend >= spendingFilter.min && f.spend <= spendingFilter.max
     ),
     "BCAP1"
   )
@@ -72,12 +72,13 @@ export const BCapNavigator = () => {
     });
 
   React.useEffect(() => {
-    setSpendingLimits({ min, max });
+    setSpendingFilter({ min, max });
   }, [min, max]);
 
   return (
     <div style={{ display: "flex", gap: 5 }}>
-      <div>
+      <div style={{ padding: "0px 10px", minWidth: 300 }}>
+        <h2 style={{ marginTop: 0 }}>{"Navigation"}</h2>
         <TreeView treeData={treeData} />
         <hr />
         <div>{"Filters"}</div>
@@ -88,16 +89,53 @@ export const BCapNavigator = () => {
           min={min}
           max={max}
           onChange={(val) =>
-            setSpendingLimits({ min, max: parseInt(val.currentTarget.value) })
+            setSpendingFilter({ min, max: parseInt(val.currentTarget.value) })
           }
         />
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div>{`$ ${numberWithCommaAndDecimal(spendingLimits.min, 2)}`}</div>
-          <div>{`$ ${numberWithCommaAndDecimal(spendingLimits.max, 2)}`}</div>
+          <div>{`$ ${numberWithCommaAndDecimal(spendingFilter.min, 2)}`}</div>
+          <div>{`$ ${numberWithCommaAndDecimal(spendingFilter.max, 2)}`}</div>
         </div>
       </div>
-      <hr />
-      <div style={{ flex: 1 }}>{JSON.stringify(selectedApps)}</div>
+      <div style={{ flex: 1, borderLeft: "2px solid black", padding: 15 }}>
+        {selectedApps
+          ?.filter(
+            (f) =>
+              f.spend >= spendingFilter.min && f.spend <= spendingFilter.max
+          )
+          ?.map((m) => (
+            <AppTile id={m.id} appName={m.name} spend={m.spend} />
+          ))}
+      </div>
+    </div>
+  );
+};
+
+const AppTile = ({
+  id,
+  appName,
+  spend,
+}: {
+  id: string;
+  appName: string;
+  spend: number;
+}) => {
+  return (
+    <div
+      key={id}
+      style={{
+        border: "black solid 1px",
+        padding: 10,
+        margin: 10,
+        float: "left",
+        width: 200,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <h2 style={{ marginBottom: 0 }}>{appName}</h2>
+      <h3>{`Total spend $ ${numberWithCommaAndDecimal(spend, 2)}`}</h3>
     </div>
   );
 };

@@ -38,6 +38,10 @@
   align-items: center;
 }
 
+.appTile > h2, .appTile > h3 {
+  text-align: center;
+}
+
 .appTile > h2 {
   margin-bottom: 0px;
 }

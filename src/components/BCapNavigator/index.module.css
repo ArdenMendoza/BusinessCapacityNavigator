@@ -1,0 +1,43 @@
+.bcapNavigatorContainer {
+  display: flex;
+  gap: 5px;
+}
+
+.leftPanel {
+  padding: 0px 10px;
+  min-width: 300px;
+}
+
+.leftPanel > h2 {
+  margin-top: 0px;
+}
+
+.leftPanel > input {
+  width: 100%;
+}
+
+.inputLabelsContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.mainPanel {
+  flex: 1;
+  border-left: 1px solid #888;
+  padding: 15px;
+}
+
+.appTile {
+  border: black solid 1px;
+  padding: 10px;
+  margin: 10px;
+  float: left;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.appTile > h2 {
+  margin-bottom: 0px;
+}

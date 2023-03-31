@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
-import { TreeViewContext } from "../context";
+import { TreeViewContext } from "../../context";
+import styles from "./index.module.css";
 export type TreeNode = {
   id: number;
   label: string;
@@ -11,9 +12,12 @@ export const TreeNode: React.FC<{ node: TreeNode; indention: number }> = ({
   node,
   indention,
 }) => {
-  const { state, dispatch } = useContext(TreeViewContext);
+  const {
+    state: { expandedNodes, selectedNode },
+    dispatch,
+  } = useContext(TreeViewContext);
 
-  const isExpanded = state.expandedNodes.includes(node.id);
+  const isExpanded = expandedNodes.includes(node.id);
 
   const handleToggle = () => {
     if (isExpanded) {
@@ -24,15 +28,20 @@ export const TreeNode: React.FC<{ node: TreeNode; indention: number }> = ({
   };
 
   return (
-    <div key={node.id} style={{ margin: 5 }}>
+    <div key={node.id} className={styles.mainContainer}>
       {node.children && (
-        <button style={{ marginRight: 5 }} onClick={handleToggle}>
-          {isExpanded ? "-" : "+"}
-        </button>
+        <button onClick={handleToggle}>{isExpanded ? "-" : "+"}</button>
       )}
-      <span onClick={() => node.onClick && node.onClick()}>{node.label}</span>
+      <span
+        className={`${styles.nodeLabel} ${
+          node.label === selectedNode.nodeName && styles.nodeLabelSelected
+        }`}
+        onClick={() => node.onClick && node.onClick()}
+      >
+        {node.label}
+      </span>
       {node.children && isExpanded && (
-        <div style={{ marginLeft: 30 }}>
+        <div className={styles.treeContainer}>
           {node.children.map((childNode) => (
             <TreeNode
               key={childNode.id}

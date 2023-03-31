@@ -1,0 +1,18 @@
+.mainContainer {
+  margin: 5px;
+  cursor: pointer;
+}
+.nodeLabel:hover {
+  color: blue;
+}
+.nodeLabelSelected {
+  color: blue;
+}
+
+.mainContainer > button {
+  margin-right: 5px;
+}
+
+.treeContainer {
+  margin-left: 30px;
+}

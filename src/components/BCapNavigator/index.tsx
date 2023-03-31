@@ -1,8 +1,9 @@
 import React, { useContext } from "react";
-import { TreeView } from "./components/TreeView";
-import { SelectedNode, TreeViewContext } from "./context";
-import { Application } from "./models";
-import { numberWithCommaAndDecimal } from "./utils/numberUtils";
+import { TreeView } from "../TreeView";
+import { SelectedNode, TreeViewContext } from "../../context";
+import { Application } from "../../models";
+import { numberWithCommaAndDecimal } from "../../utils/numberUtils";
+import styles from "./index.module.css";
 
 const getUnique = (dataArray: Application[], propName: string) =>
   Array.from(new Set(dataArray.map((item: any) => item[propName])));
@@ -113,12 +114,12 @@ export const BCapNavigator = () => {
   );
 
   return (
-    <div style={{ display: "flex", gap: 5 }}>
-      <div style={{ padding: "0px 10px", minWidth: 300 }}>
-        <h2 style={{ marginTop: 0 }}>{"Navigation"}</h2>
+    <div className={styles.bcapNavigatorContainer}>
+      <div className={styles.leftPanel}>
+        <h2>{"Navigation"}</h2>
         <TreeView treeData={treeData} />
         <hr />
-        <div>{"Filters"}</div>
+        <h3>{"Filters"}</h3>
         <label htmlFor="spending">{"Spending"}</label>
         <input
           type="range"
@@ -129,14 +130,13 @@ export const BCapNavigator = () => {
             setSpendingFilters({ min, max: parseInt(val.currentTarget.value) })
           }
           value={spendingFilters.max}
-          style={{ width: "100%" }}
         />
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div className={styles.inputLabelsContainer}>
           <div>{`$ ${numberWithCommaAndDecimal(spendingFilters.min, 2)}`}</div>
           <div>{`$ ${numberWithCommaAndDecimal(spendingFilters.max, 2)}`}</div>
         </div>
       </div>
-      <div style={{ flex: 1, borderLeft: "1px solid #888", padding: 15 }}>
+      <div className={styles.mainPanel}>
         {appTilesData?.map((m) => (
           <AppTile id={m.id} appName={m.name} spend={m.spend} />
         ))}
@@ -155,20 +155,8 @@ const AppTile = ({
   spend: number;
 }) => {
   return (
-    <div
-      key={id}
-      style={{
-        border: "black solid 1px",
-        padding: 10,
-        margin: 10,
-        float: "left",
-        width: 200,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <h2 style={{ marginBottom: 0 }}>{appName}</h2>
+    <div key={id} className={styles.appTile}>
+      <h2>{appName}</h2>
       <h3>{`Total spend $ ${numberWithCommaAndDecimal(spend, 2)}`}</h3>
     </div>
   );

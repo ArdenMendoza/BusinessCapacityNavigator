@@ -1,5 +1,5 @@
 import { useReducer } from "react";
-import { BCapNavigator } from "./BCapNavigator";
+import { BCapNavigator } from "./components/BCapNavigator";
 import { TreeViewContext, treeViewReducer, TreeViewState } from "./context";
 
 function App() {

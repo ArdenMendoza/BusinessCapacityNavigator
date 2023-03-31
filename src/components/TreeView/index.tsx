@@ -1,8 +1,9 @@
 import React from "react";
 import { useContext } from "react";
-import { TreeViewContext } from "../context";
-import { Application } from "../models";
-import { TreeNode } from "./TreeNode";
+import { TreeViewContext } from "../../context";
+import { Application } from "../../models";
+import { TreeNode } from "../TreeNode/index";
+import styles from "./index.module.css";
 
 export const TreeView = ({ treeData }: { treeData: TreeNode[] }) => {
   const { dispatch } = useContext(TreeViewContext);
@@ -19,7 +20,7 @@ export const TreeView = ({ treeData }: { treeData: TreeNode[] }) => {
   }, []);
 
   return (
-    <div key={"treeView"} style={{ display: "flex", flexDirection: "column" }}>
+    <div key={"treeView"} className={styles.treeViewContainer}>
       {treeData.map((bcap1) => (
         <TreeNode key={bcap1.id} node={bcap1} indention={1} />
       ))}
